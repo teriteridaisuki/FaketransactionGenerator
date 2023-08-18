@@ -17,7 +17,7 @@ chrome_options = Options()
 chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
 chrome_driver = r"C:\Program Files\Google\Chrome\Application\chromedriver.exe"
 driver = webdriver.Chrome(chrome_driver, chrome_options=chrome_options)
-driver.implicitly_wait(10)
+driver.implicitly_wait(3)
 rightclick = ActionChains(driver)
 
 
@@ -29,24 +29,31 @@ def switchtitle(title):
 
 def checkerselect(place,name):#选择审批人并提交
     driver.find_element(By.XPATH, "//div[text()= '"+place+"']/../../td[2]").click()
-    driver.find_elements(By.XPATH, "//div[@class='EI6JOB-u-l' and @style='margin-top:-8px;right:2px;']")[1].click()
-    driver.find_element(By.XPATH, "//div[text()= '"+name+"']").click()
-    time.sleep(2)
-    driver.find_elements(By.XPATH, "//div[text()= '确定']")[1].click()
+    wait(driver.find_elements,By.XPATH, "//div[@class='EI6JOB-u-l' and @style='margin-top:-8px;right:2px;']",clickstat=True,clicknum=1)
+    for element in driver.find_elements(By.XPATH,"//div[text()= '"+name+"']"):
+        try:
+            element.click()
+        except:
+            pass
+    wait(driver.find_elements,By.XPATH, "//div[text()= '确定']",clickstat=True,clicknum=1)
 def duplicate(formnum):#复制之前单据
     switchtitle("财务一体化")
+    driver.find_element(By.XPATH, "//span[text()= '首页']").click()
     driver.find_element(By.XPATH, "//img[contains(@src,'bz.svg')]").click()
     driver.find_element(By.XPATH, "//span[text()= '应付及付款']").click()
     driver.find_element(By.XPATH, "//span[text()= '支付内部往来清算款']").click()
     driver.find_element(By.XPATH, "//span[text()= '复制']").click()
     driver.find_element(By.XPATH, "//label[text()= '单据编号：']/../following-sibling::div[1]/div[1]/input[1]").send_keys(formnum)
     driver.find_elements(By.XPATH, "//img[contains(@src,'查询_chaxun_U_B.png')]")[1].click()
-    ActionChains(driver).double_click(driver.find_element(By.XPATH, "//div[text()= '"+formnum+"']")).perform()
-    time.sleep(5)
-    driver.find_element(By.XPATH, "//span[text()= '保存']").click()
+    time.sleep(3)
+    while True:
+        try:
+            ActionChains(driver).double_click(driver.find_element(By.XPATH, "//div[text()= '" + formnum + "']")).perform()
+        except:
+            break
+    wait(driver.find_element,By.XPATH, "//span[text()= '保存']",clickstat=True)
     driver.find_element(By.XPATH, "//div[text()= '确定']").click()
-    time.sleep(5)
-    driver.find_elements(By.XPATH, "//span[text()= '提交']")[1].click()
+    wait(driver.find_elements,By.XPATH, "//span[text()= '提交']",clickstat=True,clicknum=1)
     driver.find_element(By.XPATH, "//div[text()= '提交']").click()
 
 def submitprocess():
@@ -76,7 +83,7 @@ def wait(func,*para,clickstat=False,clicknum=None):
             return result    # 如果成功运行，返回结果并退出函数
         except Exception:   # 捕获所有异常
             pass  # 如果出现异常，继续循环
-main(3,"FFK2011202308003694")
+main(2,"FFK2011202308003694")
 
 
 
